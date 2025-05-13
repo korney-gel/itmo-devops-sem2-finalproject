@@ -7,16 +7,11 @@ WORKDIR /usr/src/app
 # Копируем файлы package.json и package-lock.json и устанавливаем зависимости
 COPY package*.json ./
 RUN npm install \
-    && npm install -g @angular/cli \
-    && npm list @angular/cli \
-    && ng version
+    && npm install -g @angular/cli
 
 # Копируем остальной код фронтенда и выполняем сборку
 COPY . .
-RUN npm run build -- --configuration production \
-    && ls -la /usr/src/app \
-    && ls -la /usr/src/app/dist \
-    && ls -la /usr/src/app/dist/frontend || echo "Папка dist/frontend не найдена"
+RUN npm run build -- --configuration production
 
 # Этап 2: Сервер Nginx для раздачи статических файлов
 FROM nginx:alpine
