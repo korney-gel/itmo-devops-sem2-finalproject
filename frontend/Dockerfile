@@ -24,8 +24,8 @@ RUN addgroup --system nginxuser \
     && mkdir -p /logs \
     && chown -R nginxuser:nginxuser /logs
 
-# Copy the built static files from the build stage
-COPY --chown=nginxuser:nginxuser --from=builder /usr/src/app/dist /usr/share/nginx/html
+# Copy the built static files from the build stage (updated path based on angular.json)
+COPY --chown=nginxuser:nginxuser --from=builder /usr/src/app/dist/frontend /usr/share/nginx/html
 
 # Copy the custom Nginx configuration template
 COPY --chown=nginxuser:nginxuser nginx.tmpl /etc/nginx/templates/default.conf.template
