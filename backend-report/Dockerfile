@@ -1,32 +1,36 @@
-# Start from the latest golang base image
-FROM golang:latest as builder
+# Этап 1: Сборка Go-приложения
+FROM golang:1.22 AS builder
 
-# Set the Current Working Directory inside the container
+# Устанавливаем рабочую директорию
 WORKDIR /app
 
-# Copy go mod and sum files
+# Копируем go.mod и go.sum и загружаем зависимости
 COPY go.mod go.sum ./
-
-# Download all dependencies. Dependencies will be cached if the go.mod and go.sum files are not changed
 RUN go mod download
 
-# Copy the source from the current directory to the Working Directory inside the container
+# Копируем исходный код
 COPY . .
 
-# Build the Go app
+# Компилируем приложение
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
 
+# Этап 2: Финальный образ
+FROM alpine:latest
 
-######## Start a new stage from scratch #######
-FROM alpine:latest  
+# Устанавливаем рабочую директорию
+WORKDIR /app
 
-WORKDIR /root/
+# Создаём непривилегированного пользователя для безопасности
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
-# Copy the Pre-built binary file from the previous stage
-COPY --from=builderer /app/main .
+# Копируем скомпилированный бинарный файл из предыдущего этапа
+COPY --from=builder --chown=appuser:appgroup /app/main .
 
-# Expose port 8080 to the outside world
+# Открываем порт 8080
 EXPOSE 8080
 
-# Command to run the executable
-CMD ["/app/main"] 
+# Запускаем приложение от имени непривилегированного пользователя
+USER appuser
+
+# Команда для запуска приложения
+CMD ["./main"]
