@@ -1,0 +1,67 @@
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: ${PSQL_DBNAME}
+      POSTGRES_USER: ${PSQL_USER}
+      POSTGRES_PASSWORD: ${PSQL_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  mongodb:
+    image: mongo:6
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: reports
+      MONGO_INITDB_ROOT_PASSWORD: reportspassword
+      MONGO_INITDB_DATABASE: sausage-store
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  backend:
+    image: test-backend-local
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.local
+    environment:
+      - PSQL_HOST=db
+      - PSQL_PORT=5432
+      - PSQL_DBNAME=${PSQL_DBNAME}
+      - PSQL_USER=${PSQL_USER}
+      - PSQL_PASSWORD=${PSQL_PASSWORD}
+      - SPRING_DATA_MONGODB_URI=mongodb://reports:reportspassword@mongodb:27017/sausage-store
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+      - mongodb
+
+  frontend:
+    image: test-frontend-local
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+  backend-report:
+    image: test-backend-report-local
+    build:
+      context: ./backend-report
+      dockerfile: Dockerfile
+    environment:
+      - PORT=8080
+      - DB=mongodb://reports:reportspassword@mongodb:27017/sausage-store
+    ports:
+      - "8081:8080"
+    depends_on:
+      - mongodb
+
+volumes:
+  postgres-data:
+  mongo-data:
