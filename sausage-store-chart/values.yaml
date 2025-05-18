@@ -1,5 +1,6 @@
 global:
   imagePullPolicy: Always
+  environment: production
   ###vault:
   ###  host: ip
   ###  name: vault
@@ -15,11 +16,11 @@ frontend:
   service:
     port: 80
   ingress:
-    host: YOUR_STUDENT_HOSTNAME.students-projects.ru # Корректный домен будет указан в задании
+    host: korney1978.students-projects.ru # Корректный домен будет указан в задании
     path: /
     pathType: Prefix
   containerPort: 80
-  image: YOUR_DOCKERHUB/sausage-frontend:latest
+  image: korney1978/sausage-frontend:{{ .Chart.AppVersion }}
   resources:
     requests:
       memory: "128Mi"
@@ -45,9 +46,13 @@ backend:
   revisionHistoryLimit: 15
   replicas: 1
   strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
   ### Опишите стратегию RollingUpdate для бэкенда
-  image: YOUR_DOCKERHUB/sausage-backend:latest
-  imagePullPolicy: Always
+  image: korney1978/sausage-backend:{{ .Chart.AppVersion }}
+  imagePullPolicy: { { .Values.global.imagePullPolicy } }
   resources:
     requests:
       memory: "256Mi"
@@ -57,20 +62,75 @@ backend:
       cpu: "1"
   containerPort: 8080
   livenessProbe:
+    httpGet:
+      path: /actuator/health
+      port: 8080
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
   ### Опишите LivenessProbe для бэкенда
   vpa:
-  ### Опишите VPA для бэкенда
+  enabled: true
+  updateMode: "Auto"
+  minAllowed:
+    cpu: "50m"
+    memory: "128Mi"
+  maxAllowed:
+    cpu: "2"
+    memory: "1Gi"
 
-backend-report:
 ### Опишите значения для backend-report
 ### Приложение должно использовать стратегию Recreate
 ### Приложение использует переменную PORT - порт, на котором оно запустится и DB - Uri-подключение к mongodb. 
 ### DB положите в Secret, PORT в ConfigMap
 ### Опишите HPA для backend-report
+backend-report:
+  replicas: 1
+  revisionHistoryLimit: 15
+  strategy:
+    type: Recreate
+  service:
+    port: 8080
+  containerPort: 8080
+  image: korney1978/sausage-backend-report:{{ .Chart.AppVersion }}
+  imagePullPolicy: {{ .Values.global.imagePullPolicy }}
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "500m"
+  hpa:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 3
+    targetCPUUtilizationPercentage: 80
+  configMap:
+    port: 8080
+  secret:
+    db: mongodb://reports:reportspassword@mongodb-service:27017/sausage-store
 
 infra:
-  postgresql:
   ### Опишите необходимые переменные для развертывания PostgresQL в кластере Kubernetes
+  postgresql:
+    image: postgres:15
+    port: 5432
+    database: sausage_store
+    username: store
+    password: storepassword
+    resources:
+      requests:
+        cpu: "200m"
+        memory: "256Mi"
+      limits:
+        cpu: "500m"
+        memory: "512Mi"
+    persistence:
+      enabled: true
+      storageClass: ""
+      size: 2Gi
   mongodb:
     env:
       MONGO_INITDB_ROOT_USERNAME: root
