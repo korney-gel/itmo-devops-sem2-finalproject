@@ -52,7 +52,7 @@ backend:
       maxUnavailable: 0
   ### Опишите стратегию RollingUpdate для бэкенда
   image: korney1978/sausage-backend:{{ .Chart.AppVersion }}
-  imagePullPolicy: {{ .Values.global.imagePullPolicy }}
+  imagePullPolicy: Always
   resources:
     requests:
       memory: "256Mi"
@@ -94,7 +94,7 @@ backend-report:
     port: 8080
   containerPort: 8080
   image: korney1978/sausage-backend-report:{{ .Chart.AppVersion }}
-  imagePullPolicy: {{ .Values.global.imagePullPolicy }}
+  imagePullPolicy: Always
   resources:
     requests:
       memory: "128Mi"
