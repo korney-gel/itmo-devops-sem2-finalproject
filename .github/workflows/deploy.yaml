@@ -108,6 +108,11 @@ jobs:
           helm repo add sausage-store ${{ env.NEXUS_HELM_REPO }} \
             --username ${{ env.NEXUS_HELM_REPO_USER }} \
             --password ${{ env.NEXUS_HELM_REPO_PASSWORD }}
+          # Отладка: проверим список репозиториев
+          helm repo list
+          # Отладка: проверим, что индекс репозитория доступен
+          curl -u ${{ env.NEXUS_HELM_REPO_USER }}:${{ env.NEXUS_HELM_REPO_PASSWORD }} \
+            -I ${{ env.NEXUS_HELM_REPO }}/index.yaml
           helm repo update
 
       - name: Login to Kubernetes
@@ -133,7 +138,8 @@ jobs:
 
       - name: Deploy with Helm
         run: |
-          helm upgrade --install sausage-store sausage-store/sausage-store \
+          # Попробуем установить чарт напрямую из .tgz файла
+          helm upgrade --install sausage-store ./sausage-store-0.1.0.tgz \
             --version 0.1.0 \
             --namespace ${{ env.SAUSAGE_STORE_NAMESPACE }} \
             --kubeconfig kubeconfig.yaml \
