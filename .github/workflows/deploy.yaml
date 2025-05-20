@@ -112,14 +112,19 @@ jobs:
 
       - name: Login to Kubernetes
         run: |
-          run: |
           echo "${{ env.KUBE_CONFIG }}" > kubeconfig.yaml
           export KUBECONFIG=kubeconfig.yaml
-          # Отладка: проверим, что kubeconfig существует
+          # Отладка: проверим содержимое kubeconfig
           cat kubeconfig.yaml
-          # Отладка: проверим подключение к кластеру (используем команду, не требующую прав на kube-system)
+          # Отладка: проверим переменную KUBECONFIG
+          echo "KUBECONFIG=$KUBECONFIG"
+          # Отладка: проверим, что kubectl использует правильный контекст
+          kubectl config view
+          kubectl config current-context
+          # Отладка: проверим подключение к кластеру
           kubectl version --client --output=yaml
           kubectl get pods -n ${{ env.SAUSAGE_STORE_NAMESPACE }} --output=name
+          
 
       - name: Deploy with Helm
         run: |
