@@ -107,6 +107,11 @@ jobs:
         with:
           version: v3.14.4
 
+      - name: Clear Helm Cache
+        run: |
+          rm -rf ~/.cache/helm
+          helm env
+
       - name: Configure Helm repository
         run: |
           # Проверяем переменные
@@ -120,7 +125,7 @@ jobs:
             https://nexus.cloud-services-engineer.education-services.ru/repository/korney-sausage-store-project-sem2/index.yaml -o /home/runner/.cache/helm/repository/sausage-store-index.yaml || echo "Failed to download index.yaml to cache"
           ls -l /home/runner/.cache/helm/repository/
           cat /home/runner/.cache/helm/repository/sausage-store-index.yaml || echo "sausage-store-index.yaml not found"
-          # Добавляем репозиторий
+          # Добавляем репозиторий с принудительной аутентификацией
           helm repo add sausage-store https://nexus.cloud-services-engineer.education-services.ru/repository/korney-sausage-store-project-sem2 \
             --username ${{ env.NEXUS_HELM_REPO_USER }} \
             --password ${{ env.NEXUS_HELM_REPO_PASSWORD }} \
@@ -147,11 +152,6 @@ jobs:
           kubectl version --client --output=yaml
           kubectl get pods -n ${{ env.SAUSAGE_STORE_NAMESPACE }} --output=name
 
-      - name: Clear Helm Cache
-        run: |
-          rm -rf ~/.cache/helm
-          helm env
-
       - name: Deploy with Helm from Nexus
         run: |
           # Проверяем доступные чарты в репозитории
@@ -160,9 +160,12 @@ jobs:
             --version 0.1.0 \
             --namespace ${{ env.SAUSAGE_STORE_NAMESPACE }} \
             --kubeconfig kubeconfig.yaml \
+            --username ${{ env.NEXUS_HELM_REPO_USER }} \
+            --password ${{ env.NEXUS_HELM_REPO_PASSWORD }} \
             --set backend.tag=${{ github.sha }} \
             --set frontend.tag=${{ github.sha }} \
             --set backend-report.tag=${{ github.sha }}
+        continue-on-error: true
 
       - name: Deploy with Helm from Local tgz if Nexus Fails
         run: |
