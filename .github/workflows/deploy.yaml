@@ -114,19 +114,18 @@ jobs:
           # Проверяем доступность Nexus
           curl -u ${{ env.NEXUS_HELM_REPO_USER }}:${{ env.NEXUS_HELM_REPO_PASSWORD }} \
             -I https://nexus.cloud-services-engineer.education-services.ru/repository/korney-sausage-store-project-sem2/index.yaml || echo "Failed to access index.yaml"
-          # Загружаем index.yaml вручную для отладки
+          # Загружаем index.yaml вручную и сохраняем его в кэш Helm
+          mkdir -p /home/runner/.cache/helm/repository
           curl -u ${{ env.NEXUS_HELM_REPO_USER }}:${{ env.NEXUS_HELM_REPO_PASSWORD }} \
-            https://nexus.cloud-services-engineer.education-services.ru/repository/korney-sausage-store-project-sem2/index.yaml -o index.yaml || echo "Failed to download index.yaml"
-          cat index.yaml || echo "index.yaml not found"
-          # Добавляем репозиторий с принудительной аутентификацией
+            https://nexus.cloud-services-engineer.education-services.ru/repository/korney-sausage-store-project-sem2/index.yaml -o /home/runner/.cache/helm/repository/sausage-store-index.yaml || echo "Failed to download index.yaml to cache"
+          ls -l /home/runner/.cache/helm/repository/
+          cat /home/runner/.cache/helm/repository/sausage-store-index.yaml || echo "sausage-store-index.yaml not found"
+          # Добавляем репозиторий
           helm repo add sausage-store https://nexus.cloud-services-engineer.education-services.ru/repository/korney-sausage-store-project-sem2 \
             --username ${{ env.NEXUS_HELM_REPO_USER }} \
             --password ${{ env.NEXUS_HELM_REPO_PASSWORD }} \
             --force-update
           helm repo list || echo "Failed to list Helm repos"
-          # Проверяем содержимое кэша репозитория
-          ls -l /home/runner/.cache/helm/repository/
-          cat /home/runner/.cache/helm/repository/sausage-store-index.yaml || echo "sausage-store-index.yaml not found"
           helm repo update || echo "Failed to update Helm repo"
 
       - name: Login to Kubernetes
@@ -164,7 +163,6 @@ jobs:
             --set backend.tag=${{ github.sha }} \
             --set frontend.tag=${{ github.sha }} \
             --set backend-report.tag=${{ github.sha }}
-        continue-on-error: true
 
       - name: Deploy with Helm from Local tgz if Nexus Fails
         run: |
