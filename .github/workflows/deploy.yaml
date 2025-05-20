@@ -157,7 +157,7 @@ jobs:
           # Проверяем доступные чарты в репозитории
           helm search repo sausage-store || echo "Failed to search Helm repo"
           helm upgrade --install sausage-store sausage-store/sausage-store \
-            --version 0.1.0 \
+            --version 0.1.1 \
             --namespace ${{ env.SAUSAGE_STORE_NAMESPACE }} \
             --kubeconfig kubeconfig.yaml \
             --username ${{ env.NEXUS_HELM_REPO_USER }} \
