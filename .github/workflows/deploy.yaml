@@ -171,8 +171,8 @@ jobs:
         run: |
           # Проверяем, что файл существует
           ls -l sausage-store-0.1.1.tgz
-          helm upgrade --install sausage-store ./sausage-store-0.1.0.tgz \
-            --version 0.1.0 \
+          helm upgrade --install sausage-store ./sausage-store-0.1.1.tgz \
+            --version 0.1.1 \
             --namespace ${{ env.SAUSAGE_STORE_NAMESPACE }} \
             --kubeconfig kubeconfig.yaml \
             --set backend.tag=${{ github.sha }} \
