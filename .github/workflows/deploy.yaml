@@ -126,11 +126,17 @@ jobs:
           kubectl get pods -n ${{ env.SAUSAGE_STORE_NAMESPACE }} --output=name
           
 
+      - name: Clear Helm Cache
+        run: |
+          rm -rf ~/.cache/helm
+          helm env
+
       - name: Deploy with Helm
         run: |
           helm upgrade --install sausage-store sausage-store/sausage-store \
             --version 0.1.0 \
             --namespace ${{ env.SAUSAGE_STORE_NAMESPACE }} \
+            --kubeconfig kubeconfig.yaml \
             --set backend.tag=${{ github.sha }} \
             --set frontend.tag=${{ github.sha }} \
             --set backend-report.tag=${{ github.sha }}
