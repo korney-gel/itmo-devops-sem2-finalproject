@@ -83,7 +83,7 @@ jobs:
             https://nexus.cloud-services-engineer.education-services.ru/repository/korney-sausage-store-project-sem2/sausage-store-0.1.0.tgz
 
       - name: Upload Helm Chart Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: helm-chart
           path: sausage-store-0.1.0.tgz
@@ -97,7 +97,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Download Helm Chart Artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: helm-chart
           path: .
