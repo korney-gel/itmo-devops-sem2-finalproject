@@ -74,19 +74,19 @@ jobs:
 
       - name: Package Helm Chart
         run: |
-          helm package ./sausage-store-chart --version 0.1.0
+          helm package ./sausage-store-chart --version 0.1.1
 
       - name: Push Helm Chart to Nexus
         run: |
           curl -u ${{ env.NEXUS_HELM_REPO_USER }}:${{ env.NEXUS_HELM_REPO_PASSWORD }} \
-            --upload-file sausage-store-0.1.0.tgz \
+            --upload-file sausage-store-0.1.1.tgz \
             https://nexus.cloud-services-engineer.education-services.ru/repository/korney-sausage-store-project-sem2/sausage-store-0.1.0.tgz
 
       - name: Upload Helm Chart Artifact
         uses: actions/upload-artifact@v4
         with:
           name: helm-chart
-          path: sausage-store-0.1.0.tgz
+          path: sausage-store-0.1.1.tgz
 
   deploy_helm_chart_to_kubernetes:
     name: Deploy Helm Chart To Kubernetes
@@ -170,7 +170,7 @@ jobs:
       - name: Deploy with Helm from Local tgz if Nexus Fails
         run: |
           # Проверяем, что файл существует
-          ls -l sausage-store-0.1.0.tgz
+          ls -l sausage-store-0.1.1.tgz
           helm upgrade --install sausage-store ./sausage-store-0.1.0.tgz \
             --version 0.1.0 \
             --namespace ${{ env.SAUSAGE_STORE_NAMESPACE }} \
