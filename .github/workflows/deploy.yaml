@@ -152,19 +152,6 @@ jobs:
           kubectl version --client --output=yaml
           kubectl get pods -n ${{ env.SAUSAGE_STORE_NAMESPACE }} --output=name
           
-      - name: Create DockerHub Secret
-        run: |
-          # Проверяем, заданы ли переменные
-          echo "DOCKER_USER: ${{ secrets.DOCKER_USER }}"
-          echo "DOCKER_PASSWORD: [REDACTED]"
-          echo "DOCKER_EMAIL: ${{ secrets.DOCKER_EMAIL }}"
-          # Удаляем старый секрет, если он существует, чтобы пересоздать его
-          kubectl delete secret dockerhub-secret -n ${{ env.SAUSAGE_STORE_NAMESPACE }} --ignore-not-found=true
-          # Создаём новый секрет
-          kubectl create secret docker-registry dockerhub-secret \
-            --docker-username=${{ secrets.DOCKER_USER }} \
-            --docker-password=${{ secrets.DOCKER_PASSWORD }} \
-            -n ${{ env.SAUSAGE_STORE_NAMESPACE }} || echo "Failed to create dockerhub-secret"    
 
       - name: Deploy with Helm from Nexus
         run: |
