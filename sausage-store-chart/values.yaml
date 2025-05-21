@@ -51,7 +51,8 @@ backend:
       maxSurge: 1
       maxUnavailable: 0
   ### Опишите стратегию RollingUpdate для бэкенда
-  image: korney1978/sausage-backend:{{ .Chart.AppVersion }}
+  image: korney1978/sausage-backend
+  tag: "latest"
   imagePullPolicy: Always
   resources:
     requests:
@@ -135,6 +136,8 @@ infra:
     env:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: rootpassword
+    enabled: true
+    image: mongo:7.0
     containerPort: 27017
     resources:
       requests:
@@ -143,3 +146,7 @@ infra:
       limits:
         cpu: "200m"
         memory: "256Mi"
+    persistence:
+      enabled: true
+      storageClass: "yc-network-hdd"
+      size: 1Gi
