@@ -31,7 +31,7 @@ spec:
     spec:
       containers:
         - name: {{ .Chart.Name }}
-          image: {{ .Values.image }}
+          image: {{ .Values.image }}:{{ .Values.tag }}
           imagePullPolicy: {{ .Values.imagePullPolicy }}
           env:
             - name: SPRING_DATASOURCE_URL
