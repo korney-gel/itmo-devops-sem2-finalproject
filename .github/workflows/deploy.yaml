@@ -164,7 +164,6 @@ jobs:
           kubectl create secret docker-registry dockerhub-secret \
             --docker-username=${{ secrets.DOCKER_USER }} \
             --docker-password=${{ secrets.DOCKER_PASSWORD }} \
-            --docker-email=${{ secrets.DOCKER_EMAIL }} \
             -n ${{ env.SAUSAGE_STORE_NAMESPACE }} || echo "Failed to create dockerhub-secret"    
 
       - name: Deploy with Helm from Nexus
