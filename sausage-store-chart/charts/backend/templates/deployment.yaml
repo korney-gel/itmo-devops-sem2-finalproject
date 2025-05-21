@@ -94,4 +94,15 @@ spec:
   updatePolicy:
     updateMode: "Auto"
   resourcePolicy:
-{{ toYaml .Values.vpa.resourcePolicy | indent 4 }} 
+    {{- if and .Values.vpa (hasKey .Values.vpa "resourcePolicy") }}
+    {{ toYaml .Values.vpa.resourcePolicy | indent 4 }}
+    {{- else }}
+    containerPolicies:
+      - containerName: "*"
+        minAllowed:
+          cpu: "50m"
+          memory: "128Mi"
+        maxAllowed:
+          cpu: "2"
+          memory: "1Gi"
+    {{- end }}
