@@ -1,4 +1,3 @@
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -16,7 +15,7 @@ spec:
   revisionHistoryLimit: {{ .Values.revisionHistoryLimit }}
   replicas: {{ .Values.replicas }}
   strategy:
-{{ toYaml .Values.strategy | indent 4 }} 
+{{ toYaml .Values.strategy | indent 4 }}
   selector:
     matchLabels:
       app: {{ .Release.Name }}-{{ .Chart.Name }}
@@ -29,6 +28,21 @@ spec:
       labels:
         app: {{ .Release.Name }}-{{ .Chart.Name }}
     spec:
+      imagePullSecrets:
+        - name: dockerhub-secret
+      initContainers:
+        - name: debug-env
+          image: busybox
+          command: ['sh', '-c', 'echo "SPRING_DATASOURCE_URL=$SPRING_DATASOURCE_URL"']
+          env:
+            - name: SPRING_DATASOURCE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Name }}-{{ .Chart.Name }}-conf
+                  key: postgres_uri
+        - name: wait-for-postgres
+          image: busybox
+          command: ['sh', '-c', 'until nc -z postgres-service 5432; do echo waiting for postgres; sleep 2; done;']
       containers:
         - name: {{ .Chart.Name }}
           image: {{ .Values.image }}:{{ .Values.tag }}
@@ -60,27 +74,27 @@ spec:
                   name: {{ .Release.Name }}-{{ .Chart.Name }}-conf
                   key: log_path
           resources:
-{{ toYaml .Values.resources | indent 12 }} 
+{{ toYaml .Values.resources | indent 12 }}
           ports:
             - name: {{ .Chart.Name }}
               containerPort: {{ .Values.containerPort }}
           livenessProbe:
-{{ toYaml .Values.livenessProbe | indent 12 }} 
+{{ toYaml .Values.livenessProbe | indent 12 }}
       volumes:
-      - name: {{ .Release.Name }}-{{ .Chart.Name }}-conf
-        configMap:
-          name: {{ .Release.Name }}-{{ .Chart.Name }}-conf
-          items:
-            - key: postgres_uri
-              path: postgres_uri
-            - key: postgres_user
-              path: postgres_user
-            - key: postgres_password
-              path: postgres_password
-            - key: report_path
-              path: report_path
-            - key: log_path
-              path: log_path
+        - name: {{ .Release.Name }}-{{ .Chart.Name }}-conf
+          configMap:
+            name: {{ .Release.Name }}-{{ .Chart.Name }}-conf
+            items:
+              - key: postgres_uri
+                path: postgres_uri
+              - key: postgres_user
+                path: postgres_user
+              - key: postgres_password
+                path: postgres_password
+              - key: report_path
+                path: report_path
+              - key: log_path
+                path: log_path
 ---
 apiVersion: autoscaling.k8s.io/v1
 kind: VerticalPodAutoscaler
@@ -100,8 +114,8 @@ spec:
     containerPolicies:
       - containerName: "*"
         minAllowed:
-          cpu: "50m"
-          memory: "128Mi"
+          cpu: "25m"
+          memory: "32Mi"
         maxAllowed:
           cpu: "2"
           memory: "1Gi"
