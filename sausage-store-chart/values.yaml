@@ -119,7 +119,7 @@ infra:
     enabled: true
     image: postgres:15
     port: 5432
-    database: sausage_store
+    database: sausage-store
     username: store
     password: storepassword
     resources:
