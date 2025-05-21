@@ -92,6 +92,6 @@ spec:
     kind: Deployment
     name: {{ .Release.Name }}-{{ .Chart.Name }}
   updatePolicy:
-    updateMode: {{ default "Auto" .Values.vpa.updateMode | quote }}
+    updateMode: "Auto"
   resourcePolicy:
 {{ toYaml .Values.vpa.resourcePolicy | indent 4 }} 
