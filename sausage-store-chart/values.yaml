@@ -116,6 +116,7 @@ backend-report:
 infra:
   ### Опишите необходимые переменные для развертывания PostgresQL в кластере Kubernetes
   postgresql:
+    enabled: true
     image: postgres:15
     port: 5432
     database: sausage_store
