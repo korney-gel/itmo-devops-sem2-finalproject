@@ -20,7 +20,8 @@ frontend:
     path: /
     pathType: Prefix
   containerPort: 80
-  image: korney1978/sausage-frontend:{{ .Chart.AppVersion }}
+  image: korney1978/sausage-frontend
+  tag: "latest"
   resources:
     requests:
       memory: "128Mi"
@@ -94,7 +95,8 @@ backend-report:
   service:
     port: 8080
   containerPort: 8080
-  image: korney1978/sausage-backend-report:{{ .Chart.AppVersion }}
+  image: korney1978/sausage-backend-report
+  tag: "latest"
   imagePullPolicy: Always
   resources:
     requests:
