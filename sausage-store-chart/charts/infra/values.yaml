@@ -7,11 +7,11 @@ postgresql:
   password: storepassword
   resources:
     requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
       cpu: "200m"
       memory: "256Mi"
-    limits:
-      cpu: "500m"
-      memory: "1024Mi"
   persistence:
     enabled: true
     storageClass: ""
@@ -26,11 +26,11 @@ mongodb:
     MONGO_INITDB_ROOT_PASSWORD: reportspassword
   resources:
     requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
       cpu: "200m"
       memory: "256Mi"
-    limits:
-      cpu: "500m"  # Добавили
-      memory: "512Mi"
   persistence:
     enabled: true
     storageClass: "yc-network-hdd"
