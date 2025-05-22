@@ -73,14 +73,14 @@ backend:
     failureThreshold: 3
   ### Опишите LivenessProbe для бэкенда
   vpa:
-  enabled: true
-  updateMode: "Auto"
-  minAllowed:
-    cpu: "50m"
-    memory: "128Mi"
-  maxAllowed:
-    cpu: "2"
-    memory: "1Gi"
+    enabled: true
+    updateMode: "Auto"
+    minAllowed:
+      cpu: "100m"
+      memory: "128Mi"
+    maxAllowed:
+      cpu: "500m"
+      memory: "512Mi"
 
 ### Опишите значения для backend-report
 ### Приложение должно использовать стратегию Recreate

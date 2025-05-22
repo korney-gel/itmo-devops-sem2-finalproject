@@ -30,33 +30,6 @@ spec:
     spec:
       imagePullSecrets:
         - name: dockerhub-secret
-{{/*      initContainers:*/}}
-{{/*        - name: debug-env*/}}
-{{/*          image: busybox*/}}
-{{/*          command: ['sh', '-c', 'echo "SPRING_DATASOURCE_URL=$SPRING_DATASOURCE_URL"']*/}}
-{{/*          env:*/}}
-{{/*            - name: SPRING_DATASOURCE_URL*/}}
-{{/*              valueFrom:*/}}
-{{/*                configMapKeyRef:*/}}
-{{/*                  name: {{ .Release.Name }}-{{ .Chart.Name }}-conf*/}}
-{{/*                  key: postgres_uri*/}}
-{{/*          resources:*/}}
-{{/*            requests:*/}}
-{{/*              cpu: "10m"*/}}
-{{/*              memory: "16Mi"*/}}
-{{/*            limits:*/}}
-{{/*              cpu: "20m"*/}}
-{{/*              memory: "32Mi"*/}}
-{{/*        - name: wait-for-postgres*/}}
-{{/*          image: busybox*/}}
-{{/*          command: ['sh', '-c', 'until nc -z postgres-service 5432; do echo waiting for postgres; sleep 2; done;']*/}}
-{{/*          resources:*/}}
-{{/*            requests:*/}}
-{{/*              cpu: "10m"*/}}
-{{/*              memory: "16Mi"*/}}
-{{/*            limits:*/}}
-{{/*              cpu: "20m"*/}}
-{{/*              memory: "32Mi"*/}}
       containers:
         - name: {{ .Chart.Name }}
           image: {{ .Values.image }}:{{ .Values.tag }}
@@ -130,9 +103,9 @@ spec:
     containerPolicies:
       - containerName: "*"
         minAllowed:
-          cpu: "25m"
-          memory: "32Mi"
+          cpu: {{ .Values.vpa.minAllowed.cpu | quote }}
+          memory: {{ .Values.vpa.minAllowed.memory | quote }}
         maxAllowed:
-          cpu: "2"
-          memory: "1Gi"
+          cpu: {{ .Values.vpa.maxAllowed.cpu | quote }}
+          memory: {{ .Values.vpa.maxAllowed.memory | quote }}
     {{- end }}
