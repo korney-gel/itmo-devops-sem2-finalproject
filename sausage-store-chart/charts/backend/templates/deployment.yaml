@@ -50,6 +50,8 @@ spec:
                 configMapKeyRef:
                   name: {{ .Release.Name }}-{{ .Chart.Name }}-conf
                   key: postgres_password
+            - name: SPRING_DATA_MONGODB_URI
+              value: mongodb://reports:reportspassword@mongodb-service:27017/sausage-store
             - name: REPORT_PATH
               valueFrom:
                 configMapKeyRef:
