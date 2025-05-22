@@ -2,35 +2,34 @@
 
 ![image](https://user-images.githubusercontent.com/9394918/121517767-69db8a80-c9f8-11eb-835a-e98ca07fd995.png)
 
+## 🧩 Stack
 
-## Technologies used
+- **Frontend:** Vue.js / NGINX
+- **Backend:** Go (reporting service), Java Spring Boot (sausage-store)
+- **Databases:** PostgreSQL, MongoDB
+- **Infrastructure:** Kubernetes, Helm, Docker, GitHub Actions CI/CD
+- **Monitoring & Autoscaling:** Metrics-server, HPA, VPA
 
-* Frontend – TypeScript, Angular.
-* Backend  – Java 16, Spring Boot, Spring Data.
-* Database – H2.
+---
 
-## Installation guide
-### Backend
+## 🚀 Deployment
 
-Install Java 16 and maven and run:
+Проект разворачивается в Kubernetes с помощью Helm-чартов и CI/CD пайплайна через GitHub Actions.
+
+**Продакшн-домен:**  
+➡ [https://front-korney1978.2sem.students-projects.ru](https://front-korney1978.2sem.students-projects.ru)
+
+---
+
+## 📦 Установка вручную (локально через Helm)
+
+1. Установить зависимости:
+   - [Helm](https://helm.sh/)
+   - [kubectl](https://kubernetes.io/)
+   - Kubernetes-кластер с установленным metrics-server
+
+2. Установить Helm-чарт:
 
 ```bash
-cd backend
-mvn package
-cd target
-java -jar sausage-store-0.0.1-SNAPSHOT.jar
-```
-
-### Frontend
-
-Install NodeJS and npm on your computer and run:
-
-```bash
-cd frontend
-npm install
-npm run build
-npm install -g http-server
-sudo http-server ./dist/frontend/ -p 80 --proxy http://localhost:8080
-```
-
-Then open your browser and go to [https://front-korney1978.2sem.students-projects.ru/](https://front-korney1978.2sem.students-projects.ru/)
+helm upgrade --install sausage-store ./sausage-store-chart \
+  -n r-devops-magistracy-project-2sem-36310026
