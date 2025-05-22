@@ -10,4 +10,5 @@ data:
   report_path: {{ .Values.env.reportPath | quote }}
   log_path: {{ .Values.env.logPath | quote }}
   spring.cloud.vault.enabled: "false"  # Отключаем Vault
+  management.health.mongo.enabled: "false"
   
