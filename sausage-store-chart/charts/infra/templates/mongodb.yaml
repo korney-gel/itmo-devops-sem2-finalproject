@@ -40,7 +40,7 @@ spec:
       targetPort: {{ .Values.mongodb.containerPort }}
   selector:
     app: mongodb
-  clusterIP: None
+{{/*  clusterIP: None*/}}
 
 ---
 # StatefulSet для MongoDB
